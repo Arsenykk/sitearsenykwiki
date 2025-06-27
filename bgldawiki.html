@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arsenyk Wiki | Fandom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 1;
+            z-index: 1000;
+            pointer-events: auto;
+        }
+        
+        [contenteditable="true"] {
+            position: relative;
+        }
+        
+        .character-image-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        /* Editor Controls */
+        #control-menu-button {
+            transition: all 0.3s ease;
+        }
+        
+        #control-menu-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(159, 122, 234, 0.5);
+        }
+        
+        #control-menu {
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        #control-menu button {
+            transition: all 0.2s ease;
+        }
+        
+        #control-menu button:hover {
+            transform: translateX(3px);
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .wiki-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a1a2e 100%);
+        }
+        
+        .nav-tabs {
+            border-bottom: 3px solid #4a5568;
+        }
+        
+        .nav-tab {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tab:hover {
+            background-color: #2d3748;
+        }
+        
+        .nav-tab.active {
+            border-bottom: 3px solid #9f7aea;
+            margin-bottom: -3px;
+        }
+        
+        .info-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f0f0f0 100%);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+        }
+        
+        .section-title {
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #9f7aea 0%, #6b46c1 100%);
+        }
+        
+        .character-image {
+            border: 5px solid #fff;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .character-image:hover {
+            transform: scale(1.02);
+        }
+        
+        .ability-card {
+            transition: all 0.3s ease;
+        }
+        
+        .ability-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .equipment-card {
+            background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 4px solid #9f7aea;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #9f7aea;
+        }
+        
+        .timeline-item::after {
+            content: "";
+            position: absolute;
+            left: 7px;
+            top: 15px;
+            width: 1px;
+            height: calc(100% - 15px);
+            background-color: #cbd5e0;
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .color-swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="wiki-header text-white">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <div class="bg-purple-600 p-3 rounded-lg mr-4">
+                        <i class="fas fa-book text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold">Arsenyk Wiki</h1>
+                        <p class="text-gray-300">The comprehensive resource for the enigmatic slime entity</p>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div class="relative mr-4">
+                        <input type="text" placeholder="Search the wiki..." class="bg-gray-800 text-white px-4 py-2 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <button class="absolute right-3 top-2 text-gray-400">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <button class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg flex items-center">
+                        <i class="fas fa-user-plus mr-2"></i> Follow
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-gray-800 text-white">
+        <div class="container mx-auto px-4">
+            <div class="flex overflow-x-auto nav-tabs">
+                <button class="nav-tab px-6 py-3 font-medium active" data-tab="overview">
+                    <i class="fas fa-home mr-2"></i> Overview
+                </button>
+                <button class="nav-tab px-6 py-3 font-medium" data-tab="appearance">
+                    <i class="fas fa-eye mr-2"></i> Appearance
+                </button>
+                <button class="nav-tab px-6 py-3 font-medium" data-tab="abilities">
+                    <i class="fas fa-bolt mr-2"></i> Abilities
+                </button>
+                <button class="nav-tab px-6 py-3 font-medium" data-tab="equipment">
+                    <i class="fas fa-shield-alt mr-2"></i> Equipment
+                </button>
+                <button class="nav-tab px-6 py-3 font-medium" data-tab="history">
+                    <i class="fas fa-history mr-2"></i> History
+                </button>
+                <button class="nav-tab px-6 py-3 font-medium" data-tab="gallery">
+                    <i class="fas fa-images mr-2"></i> Gallery
+                </button>
+                <button class="nav-tab px-6 py-3 font-medium" data-tab="trivia">
+                    <i class="fas fa-lightbulb mr-2"></i> Trivia
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Left Column -->
+                <div class="lg:w-2/3">
+                    <div class="info-card p-6 mb-8" contenteditable="true" style="min-height: 100px;">
+                        <h2 class="text-2xl font-bold mb-4 section-title">Character Summary</h2>
+                        <p class="text-gray-700 mb-4">
+                            Arsenyk is an enigmatic 18-year-old entity with a mutable slime-based physiology that typically maintains a stable human appearance. Despite his ambiguous/feminine appearance, he identifies as male. Born in an isolated village to a gentle illusionist mother and a violent yet protective farmer father, Arsenyk's life was marked by tragedy and rejection before he emerged as a cunning, independent mercenary with unique spiritual abilities.
+                        </p>
+                        <p class="text-gray-700">
+                            His tactical mind, expressive personality, and mastery of illusions make him a formidable opponent who prioritizes survival above all else while maintaining his own moral code. Arsenyk's abilities are unregistered by traditional systems, making him an unpredictable wildcard in his mystical steampunk-medieval world.
+                        </p>
+                    </div>
+
+                    <div class="info-card p-6 mb-8" contenteditable="true" style="min-height: 100px;">
+                        <h2 class="text-2xl font-bold mb-4 section-title">Basic Information</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h3 class="font-semibold text-lg mb-2 text-purple-700">Personal Details</h3>
+                                <ul class="space-y-2">
+                                    <li><strong>Name:</strong> Arsenyk</li>
+                                    <li><strong>Age:</strong> 18 years</li>
+                                    <li><strong>Height:</strong> 169 cm</li>
+                                    <li><strong>Weight:</strong> 69 kg</li>
+                                    <li><strong>Species:</strong> Mutable slime entity (human-stable form)</li>
+                                    <li><strong>Gender:</strong> Male (feminine/ambiguous appearance)</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-2 text-purple-700">Psychological Profile</h3>
+                                <ul class="space-y-2">
+                                    <li><strong>Personality:</strong> Intelligent, expressive, sarcastic</li>
+                                    <li><strong>Morality:</strong> Neutral-independent</li>
+                                    <li><strong>Emotional Control:</strong> High (despite theatrical behavior)</li>
+                                    <li><strong>Combat Style:</strong> Ilusory, psychological, deceptive</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card p-6" contenteditable="true">
+                        <h2 class="text-2xl font-bold mb-4 section-title">Notable Relationships</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-purple-700">Parents</h3>
+                                <p class="text-gray-600 text-sm">Deceased. Mother was an illusionist, father was a protective farmer. Both killed by fearful villagers.</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-purple-700">Villagers</h3>
+                                <p class="text-gray-600 text-sm">Rejected his family out of fear of magic. Responsible for his father's death.</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-purple-700">Self</h3>
+                                <p class="text-gray-600 text-sm">Made a pact sacrificing his heart for infinite regeneration. Values survival and autonomy.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="lg:w-1/3">
+                    <div class="info-card p-6 mb-8" contenteditable="true">
+                        <div class="flex justify-center mb-4">
+                            <input type="text" placeholder="Enter image URL here" class="w-full mb-2 p-2 border rounded" onchange="updateImage(this, 'main-character-img')">
+                            <div class="character-image-container">
+                                <img id="main-character-img" src="https://via.placeholder.com/300x400/9f7aea/ffffff?text=Arsenyk" alt="Arsenyk Character Image" class="character-image rounded-lg w-full max-w-xs">
+                            </div>
+                        </div>
+                        <div class="text-center mb-4">
+                            <h3 class="text-xl font-bold">Arsenyk</h3>
+                            <p class="text-gray-600">The Enigmatic Slime Entity</p>
+                        </div>
+                        <div class="border-t border-gray-200 pt-4">
+                            <h4 class="font-semibold mb-2">Quick Facts</h4>
+                            <ul class="space-y-2 text-sm">
+                                <li><i class="fas fa-dna text-purple-600 mr-2"></i> Species: Black slime entity</li>
+                                <li><i class="fas fa-tshirt text-purple-600 mr-2"></i> Signature Outfit: Red sleeveless sweater, cargo pants</li>
+                                <li><i class="fas fa-magic text-purple-600 mr-2"></i> Primary Ability: Advanced illusions</li>
+                                <li><i class="fas fa-crosshairs text-purple-600 mr-2"></i> Combat Style: Psychological warfare</li>
+                                <li><i class="fas fa-heart text-purple-600 mr-2"></i> Status: Heart sacrificed for regeneration</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="info-card p-6" contenteditable="true" style="min-height: 100px;">
+                        <h3 class="font-semibold text-lg mb-3 text-purple-700">World Context</h3>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex items-start">
+                                <i class="fas fa-globe text-purple-600 mt-1 mr-2"></i>
+                                <span>Mystical universe blending steampunk, medieval, and contemporary arcane elements</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-ghost text-purple-600 mt-1 mr-2"></i>
+                                <span>Spirits (materialized emotions) and tormented souls (trauma residues) exist</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-hat-wizard text-purple-600 mt-1 mr-2"></i>
+                                <span>Various power sources: magics, alchemy, spells, curses, divine Graces</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-church text-purple-600 mt-1 mr-2"></i>
+                                <span>Exorcists and churches combat spiritual threats</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-purple-600 mt-1 mr-2"></i>
+                                <span>Arsenyk's abilities are unregistered by traditional systems</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appearance Tab -->
+        <div id="appearance" class="tab-content">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="lg:w-1/2">
+                    <div class="info-card p-6 mb-8" contenteditable="true">
+                        <h2 class="text-2xl font-bold mb-4 section-title">Physical Characteristics</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h3 class="font-semibold text-lg mb-2 text-purple-700">General Features</h3>
+                                <ul class="space-y-2">
+                                    <li><strong>Height:</strong> 169 cm</li>
+                                    <li><strong>Weight:</strong> 69 kg</li>
+                                    <li><strong>Build:</strong> Medium stature and structure</li>
+                                    <li><strong>Bust:</strong> Medium (similar to Ryza from Atelier)</li>
+                                    <li><strong>Ahoge:</strong> Mutable slime strand reacting to emotions</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-2 text-purple-700">Color Scheme</h3>
+                                <ul class="space-y-2">
+                                    <li class="flex items-center">
+                                        <strong>Hair:</strong> 
+                                        <span class="color-swatch bg-[#5900ff]" title="RGB: 89, 0, 255"></span>
+                                        Long with purple streaks (RGB: 89, 0, 255)
+                                    </li>
+                                    <li class="flex items-center">
+                                        <strong>Eyes:</strong> 
+                                        <span class="color-swatch bg-[#6b3d91]" title="Dark Lilac"></span>
+                                        Dark lilac with vibrant glow in certain situations
+                                    </li>
+                                    <li class="flex items-center">
+                                        <strong>Slime:</strong> 
+                                        <span class="color-swatch bg-[#000000]" title="Black"></span>
+                                        Black, mutable composition
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card p-6" contenteditable="true">
+                        <h2 class="text-2xl font-bold mb-4 section-title">Standard Attire</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h3 class="font-semibold text-lg mb-2 text-purple-700">Upper Body</h3>
+                                <ul class="space-y-2">
+                                    <li><strong>Suéter:</strong> Red high-neck sleeveless (female model)</li>
+                                    <li><strong>Jacket:</strong> Black-lined with yellow details</li>
+                                    <li><strong>Gloves:</strong> Megumin-style fingerless</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-2 text-purple-700">Lower Body</h3>
+                                <ul class="space-y-2">
+                                    <li><strong>Pants:</strong> Ripped cargo with suspenders</li>
+                                    <li><strong>Shoes:</strong> Black sporty sneakers (untied)</li>
+                                    <li><strong>Accessories:</strong> Weights (5kg per limb)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/2">
+                    <div class="info-card p-6 mb-8" contenteditable="true">
+                        <h2 class="text-2xl font-bold mb-4 section-title">Visual References</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
+                                <img src="https://via.placeholder.com/200x300/9f7aea/ffffff?text=Full+Body" alt="Full Body Reference" class="rounded-lg mb-2 w-full">
+                                <p class="text-sm text-gray-600 text-center">Full body reference showing proportions and attire</p>
+                            </div>
+                            <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
+                                <img src="https://via.placeholder.com/200x300/6b46c1/ffffff?text=Close-up" alt="Close-up Reference" class="rounded-lg mb-2 w-full">
+                                <p class="text-sm text-gray-600 text-center">Close-up showing facial features and hair</p>
+                            </div>
+                            <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
+                                <img src="https://via.placeholder.com/200x200/7e22ce/ffffff?text=Ahoge" alt="Ahoge Variants" class="rounded-lg mb-2 w-full">
+                                <p class="text-sm text-gray-600 text-center">Ahoge variations based on emotions</p>
+                            </div>
+                            <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
+                                <img src="https://via.placeholder.com/200x200/581c87/ffffff?text=Slime+Form" alt="Slime Form" class="rounded-lg mb-2 w-full">
+                                <p class="text-sm text-gray-600 text-center">Partial slime form transformation</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card p-6" contenteditable="true">
+                        <h2 class="text-2xl font-bold mb-4 section-title">Distinctive Features</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Slime Physiology</h3>
+                                <p class="text-gray-700">Despite maintaining a stable human form, Arsenyk's body is composed of mutable black slime. This allows for limited shape-shifting, though he typically keeps a human appearance to maintain his sense of identity.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Emotional Ahoge</h3>
+                                <p class="text-gray-700">The ahoge (hair antenna) is made of slime and reacts dynamically to Arsenyk's emotional state, changing shape and movement patterns based on his mood.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Eye Glow</h3>
+                                <p class="text-gray-700">In moments of intense emotion or when using certain abilities, Arsenyk's dark lilac eyes emit a vibrant glow that can range from subtle to nearly luminescent.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Abilities Tab -->
+        <div id="abilities" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="ability-card info-card p-6" contenteditable="true">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-purple-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-magic text-purple-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Illusion Projection</h3>
+                    </div>
+                    <ul class="space-y-3 text-gray-700">
+                        <li><strong>Type:</strong> Common illusion</li>
+                        <li><strong>Range:</strong> Individual targets or area effect</li>
+                        <li><strong>Duration:</strong> Up to 30 min (single), 10 min (area)</li>
+                        <li><strong>Effects:</strong> Visual, auditory, limited tactile</li>
+                        <li><strong>Limitations:</strong> Causes mental fatigue</li>
+                    </ul>
+                </div>
+
+                <div class="ability-card info-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-purple-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-brain text-purple-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">False Reality</h3>
+                    </div>
+                    <ul class="space-y-3 text-gray-700">
+                        <li><strong>Type:</strong> Shared illusion space</li>
+                        <li><strong>Activation:</strong> 4s eye contact or 1s touch</li>
+                        <li><strong>Duration:</strong> Up to 15 minutes</li>
+                        <li><strong>Effects:</strong> Full sensory immersion</li>
+                        <li><strong>Limitations:</strong> Requires Faux Collar artifact</li>
+                    </ul>
+                </div>
+
+                <div class="ability-card info-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-purple-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-atom text-purple-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Body Manipulation</h3>
+                    </div>
+                    <ul class="space-y-3 text-gray-700">
+                        <li><strong>Type:</strong> Physical transformation</li>
+                        <li><strong>Range:</strong> Self only</li>
+                        <li><strong>Effects:</strong> Limited shape-shifting</li>
+                        <li><strong>Limitations:</strong> Typically maintains human form</li>
+                        <li><strong>Special:</strong> Ahoge reacts to emotions</li>
+                    </ul>
+                </div>
+
+                <div class="ability-card info-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-purple-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-running text-purple-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Enhanced Senses</h3>
+                    </div>
+                    <ul class="space-y-3 text-gray-700">
+                        <li><strong>Reaction Time:</strong> 0.05-0.15s</li>
+                        <li><strong>Perception:</strong> 3m radius (abnormal movements)</li>
+                        <li><strong>Hearing:</strong> Above human average</li>
+                        <li><strong>Vision:</strong> Normal range but enhanced focus</li>
+                    </ul>
+                </div>
+
+                <div class="ability-card info-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-purple-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-fire text-purple-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Berserker Mode</h3>
+                    </div>
+                    <ul class="space-y-3 text-gray-700">
+                        <li><strong>Activation:</strong> Forced adrenaline</li>
+                        <li><strong>Duration:</strong> 5 minutes</li>
+                        <li><strong>Effects:</strong> Increased strength/speed</li>
+                        <li><strong>Aftermath:</strong> 6h paralysis</li>
+                        <li><strong>Cooldown:</strong> 12h</li>
+                    </ul>
+                </div>
+
+                <div class="ability-card info-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-purple-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-heartbeat text-purple-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Infinite Regeneration</h3>
+                    </div>
+                    <ul class="space-y-3 text-gray-700">
+                        <li><strong>Source:</strong> Heart sacrifice pact</li>
+                        <li><strong>Effects:</strong> Continuous cellular repair</li>
+                        <li><strong>Limitations:</strong> Doesn't prevent pain</li>
+                        <li><strong>Special:</strong> No known upper limit</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-card p-6">
+                <h2 class="text-2xl font-bold mb-4 section-title">Combat Tactics</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold text-lg mb-2 text-purple-700">Primary Approach</h3>
+                        <p class="text-gray-700 mb-4">
+                            Arsenyk specializes in psychological warfare, using illusions, misdirection, and emotional manipulation to gain advantage. His combat style prioritizes avoiding direct confrontation when possible, instead relying on deception and exploiting opponents' weaknesses.
+                        </p>
+                        <ul class="space-y-2 text-gray-700">
+                            <li><i class="fas fa-theater-masks text-purple-600 mr-2"></i> Extensive use of theatrical movements and expressions</li>
+                            <li><i class="fas fa-mask text-purple-600 mr-2"></i> Often combines illusions with real attacks</li>
+                            <li><i class="fas fa-chess text-purple-600 mr-2"></i> Tactical mind analyzes opponents quickly</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-2 text-purple-700">When Cornered</h3>
+                        <p class="text-gray-700 mb-4">
+                            Despite preferring indirect combat, Arsenyk can become brutally efficient when necessary. His berserker mode serves as a last resort, and his regeneration allows him to endure punishment that would defeat others.
+                        </p>
+                        <ul class="space-y-2 text-gray-700">
+                            <li><i class="fas fa-skull text-purple-600 mr-2"></i> Willing to fight dirty when survival is at stake</li>
+                            <li><i class="fas fa-bolt text-purple-600 mr-2"></i> Berserker mode sacrifices strategy for raw power</li>
+                            <li><i class="fas fa-heart-broken text-purple-600 mr-2"></i> Pain tolerance is high due to regeneration</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Equipment Tab -->
+        <div id="equipment" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="equipment-card p-6 rounded-lg" contenteditable="true">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-gray-200 p-3 rounded-lg mr-4">
+                            <i class="fas fa-sword text-gray-700 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">Tormento</h3>
+                            <p class="text-sm text-gray-600">Soul-reaping obsidian blade</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 text-gray-700">
+                        <li><strong>Type:</strong> Thin black sword resembling obsidian</li>
+                        <li><strong>Ability:</strong> Strikes at the soul plane</li>
+                        <li><strong>Effects:</strong> 
+                            <ul class="ml-4 mt-1 space-y-1">
+                                <li>- Absorbs common souls (torment wielder)</li>
+                                <li>- Purifies evil souls (erases them completely)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Drawback:</strong> Prolonged contact causes mental noise</li>
+                    </ul>
+                </div>
+
+                <div class="equipment-card p-6 rounded-lg" contenteditable="true">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-gray-200 p-3 rounded-lg mr-4">
+                            <i class="fas fa-gun text-gray-700 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">Ashroot</h3>
+                            <p class="text-sm text-gray-600">Magical musket rifle</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 text-gray-700">
+                        <li><strong>Type:</strong> Musket covered in black roots</li>
+                        <li><strong>Ability:</strong> Fires bat-flower seeds into targets</li>
+                        <li><strong>Effects:</strong> 
+                            <ul class="ml-4 mt-1 space-y-1">
+                                <li>- Flower grows with target's emotional instability</li>
+                                <li>- Roots immobilize user until firing</li>
+                            </ul>
+                        </li>
+                        <li><strong>Requirement:</strong> Emotional and physical charging</li>
+                    </ul>
+                </div>
+
+                <div class="equipment-card p-6 rounded-lg">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-gray-200 p-3 rounded-lg mr-4">
+                            <i class="fas fa-gun text-gray-700 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">Echopride</h3>
+                            <p class="text-sm text-gray-600">Seven-sin revolver</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 text-gray-700">
+                        <li><strong>Type:</strong> 7-bullet magical revolver</li>
+                        <li><strong>Ability:</strong> Each bullet represents a deadly sin</li>
+                        <li><strong>Effects:</strong> 
+                            <ul class="ml-4 mt-1 space-y-1">
+                                <li>- First six bullets have sin-themed effects</li>
+                                <li>- Seventh ("Pride") bullet effect unknown</li>
+                            </ul>
+                        </li>
+                        <li><strong>Status:</strong> Narrative development ongoing</li>
+                    </ul>
+                </div>
+
+                <div class="equipment-card p-6 rounded-lg">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-gray-200 p-3 rounded-lg mr-4">
+                            <i class="fas fa-mask text-gray-700 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">Illusion Mask</h3>
+                            <p class="text-sm text-gray-600">Identity-shifting artifact</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 text-gray-700">
+                        <li><strong>Type:</strong> Black toothy mask with no visible openings</li>
+                        <li><strong>Ability:</strong> Partial identity illusion</li>
+                        <li><strong>Effects:</strong> 
+                            <ul class="ml-4 mt-1 space-y-1">
+                                <li>- Wearer recognized as someone else</li>
+                                <li>- Doesn't change physical appearance</li>
+                            </ul>
+                        </li>
+                        <li><strong>Drawback:</strong> Reduces field of vision by 30%</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-card p-6">
+                <h2 class="text-2xl font-bold mb-4 section-title">Other Equipment</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold text-lg mb-2 text-purple-700">Faux Collar</h3>
+                        <p class="text-gray-700 mb-2">An illusory artifact still under study by Arsenyk. Serves as the activation source for his False Reality ability.</p>
+                        <p class="text-gray-700">Appears as an ordinary necklace but radiates strange energy when examined closely.</p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-2 text-purple-700">Training Weights</h3>
+                        <p class="text-gray-700 mb-2">5kg wrist and ankle weights worn constantly for physical training.</p>
+                        <p class="text-gray-700">Removing them provides an immediate boost to speed and agility in combat situations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="history" class="tab-content">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="lg:w-2/3">
+                    <div class="info-card p-6 mb-8" contenteditable="true">
+                        <h2 class="text-2xl font-bold mb-6 section-title">Biography</h2>
+                        <div class="space-y-8">
+                            <div class="timeline-item" contenteditable="true">
+                                <h3 class="text-xl font-semibold mb-2">Early Childhood</h3>
+                                <p class="text-gray-700">Born in an isolated village to a gentle illusionist mother and a violent yet protective farmer father. The village rejected his family due to fear of magic, creating a tense environment for young Arsenyk.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h3 class="text-xl font-semibold mb-2">Family Tragedy</h3>
+                                <p class="text-gray-700">At a young age, Arsenyk's father was killed in an attack by fanatical villagers. He fled with his mother into the wilderness, where they lived in hiding for several years before his mother succumbed to illness in the forest.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h3 class="text-xl font-semibold mb-2">Solitary Survival</h3>
+                                <p class="text-gray-700">From ages 10-17, Arsenyk lived completely alone, surviving through hunting, foraging, and occasional theft from nearby settlements. During this time, he began experimenting with and developing his unique abilities.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h3 class="text-xl font-semibold mb-2">The Pact</h3>
+                                <p class="text-gray-700">On his 17th birthday, Arsenyk performed a mysterious ritual where he sacrificed his own heart in exchange for infinite regeneration. This marked a turning point in his capabilities and survival potential.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h3 class="text-xl font-semibold mb-2">Return to Civilization</h3>
+                                <p class="text-gray-700">At age 18, Arsenyk re-entered society as a mercenary, thief, and occasional merchant. He developed skills in manipulating his image to suit different environments while maintaining his core values of survival and autonomy.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/3">
+                    <div class="info-card p-6 mb-8" contenteditable="true">
+                        <h3 class="text-xl font-semibold mb-4 text-purple-700">Core Values</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start" contenteditable="true">
+                                <div class="bg-purple-100 p-2 rounded-full mr-3 mt-1">
+                                    <i class="fas fa-heart text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">Personal Survival</h4>
+                                    <p class="text-gray-700 text-sm">Above all else, Arsenyk prioritizes his own continued existence, sometimes at the expense of others.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start" contenteditable="true">
+                                <div class="bg-purple-100 p-2 rounded-full mr-3 mt-1">
+                                    <i class="fas fa-family text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">Parents' Legacy</h4>
+                                    <p class="text-gray-700 text-sm">Despite their flaws, Arsenyk honors his parents' memory and carries their teachings forward.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="bg-purple-100 p-2 rounded-full mr-3 mt-1">
+                                    <i class="fas fa-brain text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">Emotional Autonomy</h4>
+                                    <p class="text-gray-700 text-sm">Arsenyk fiercely guards his emotional independence, resisting attachments that might compromise his freedom.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card p-6" contenteditable="true">
+                        <h3 class="text-xl font-semibold mb-4 text-purple-700">Key Events</h3>
+                        <div class="space-y-3">
+                            <div class="border-l-4 border-purple-500 pl-4 py-1" contenteditable="true">
+                                <h4 class="font-semibold">Village Rejection</h4>
+                                <p class="text-gray-700 text-sm">The community's fear of magic shaped Arsenyk's distrust of groups and institutions.</p>
+                            </div>
+                            <div class="border-l-4 border-purple-500 pl-4 py-1">
+                                <h4 class="font-semibold">Father's Death</h4>
+                                <p class="text-gray-700 text-sm">Witnessing his father's murder taught Arsenyk about both violence and protection.</p>
+                            </div>
+                            <div class="border-l-4 border-purple-500 pl-4 py-1">
+                                <h4 class="font-semibold">Mother's Passing</h4>
+                                <p class="text-gray-700 text-sm">His mother's death in the wilderness forced Arsenyk to become self-reliant at a young age.</p>
+                            </div>
+                            <div class="border-l-4 border-purple-500 pl-4 py-1">
+                                <h4 class="font-semibold">The Heart Pact</h4>
+                                <p class="text-gray-700 text-sm">Sacrificing his heart marked Arsenyk's complete commitment to survival above all else.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery Tab -->
+        <div id="gallery" class="tab-content">
+            <div class="info-card p-6 mb-8">
+                <h2 class="text-2xl font-bold mb-6 section-title">Character Visuals</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-gray-100 rounded-lg overflow-hidden" contenteditable="true">
+                        <input type="text" placeholder="Enter image URL here" class="w-full mb-2 p-2 border rounded" onchange="updateImage(this, 'standard-pose-img')">
+                        <img id="standard-pose-img" src="https://via.placeholder.com/400x500/9f7aea/ffffff?text=Standard+Pose" alt="Standard Pose" class="w-full h-64 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-semibold">Standard Appearance</h3>
+                            <p class="text-sm text-gray-600">Arsenyk in his typical outfit with characteristic pose</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg overflow-hidden">
+                        <input type="text" placeholder="Enter image URL here" class="w-full mb-2 p-2 border rounded" onchange="updateImage(this, 'combat-stance-img')">
+                        <img id="combat-stance-img" src="https://via.placeholder.com/400x500/6b46c1/ffffff?text=Combat+Stance" alt="Combat Stance" class="w-full h-64 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-semibold">Combat Readiness</h3>
+                            <p class="text-sm text-gray-600">Preparing Tormento sword with illusionary effects</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg overflow-hidden">
+                        <input type="text" placeholder="Enter image URL here" class="w-full mb-2 p-2 border rounded" onchange="updateImage(this, 'berserker-img')">
+                        <img id="berserker-img" src="https://via.placeholder.com/400x500/7e22ce/ffffff?text=Berserker+Mode" alt="Berserker Mode" class="w-full h-64 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-semibold">Berserker Activation</h3>
+                            <p class="text-sm text-gray-600">Eyes glowing during forced adrenaline state</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg overflow-hidden">
+                        <img src="https://via.placeholder.com/400x500/581c87/ffffff?text=Slime+Form" alt="Slime Form" class="w-full h-64 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-semibold">Partial Transformation</h3>
+                            <p class="text-sm text-gray-600">Arm converted to slime for tactical flexibility</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg overflow-hidden">
+                        <img src="https://via.placeholder.com/400x500/4c1d95/ffffff?text=Masked" alt="Masked" class="w-full h-64 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-semibold">Illusion Mask</h3>
+                            <p class="text-sm text-gray-600">Wearing the identity-shifting black mask</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg overflow-hidden">
+                        <img src="https://via.placeholder.com/400x500/3b0764/ffffff?text=Emotional+Ahoge" alt="Emotional Ahoge" class="w-full h-64 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-semibold">Emotional Response</h3>
+                            <p class="text-sm text-gray-600">Ahoge reacting dynamically to strong feelings</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card p-6">
+                <h2 class="text-2xl font-bold mb-6 section-title">Equipment Gallery</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-gray-100 rounded-lg overflow-hidden">
+                        <input type="text" placeholder="Enter image URL here" class="w-full mb-2 p-2 border rounded" onchange="updateImage(this, 'tormento-img')">
+                        <img id="tormento-img" src="https://via.placeholder.com/400x300/2d3748/ffffff?text=Tormento" alt="Tormento Sword" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-semibold">Tormento</h3>
+                            <p class="text-sm text-gray-600">The soul-reaping obsidian blade</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg overflow-hidden">
+                        <input type="text" placeholder="Enter image URL here" class="w-full mb-2 p-2 border rounded" onchange="updateImage(this, 'ashroot-img')">
+                        <img id="ashroot-img" src="https://via.placeholder.com/400x300/4a5568/ffffff?text=Ashroot" alt="Ashroot Rifle" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-semibold">Ashroot</h3>
+                            <p class="text-sm text-gray-600">Root-covered magical musket</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg overflow-hidden">
+                        <img src="https://via.placeholder.com/400x300/718096/ffffff?text=Echopride" alt="Echopride Revolver" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-semibold">Echopride</h3>
+                            <p class="text-sm text-gray-600">Seven-sin magical revolver</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trivia Tab -->
+        <div id="trivia" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                    <div class="info-card p-6 mb-8" contenteditable="true">
+                        <h2 class="text-2xl font-bold mb-4 section-title">Fun Facts</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Design Inspiration</h3>
+                                <p class="text-gray-700">Arsenyk's bust size was specifically noted to be similar to Ryza from Atelier series, showing the designer's attention to specific anime aesthetic references.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Color Symbolism</h3>
+                                <p class="text-gray-700">The purple hair streaks (RGB: 89, 0, 255) were chosen to represent both mystical energy and the character's connection to illusion magic.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Ahoge Mechanics</h3>
+                                <p class="text-gray-700">The emotional ahoge was designed as a visual indicator of Arsenyk's mood, with different shapes representing different emotional states (spikes for anger, droops for sadness, etc.).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card p-6" contenteditable="true">
+                        <h2 class="text-2xl font-bold mb-4 section-title">Development Notes</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Original Concept</h3>
+                                <p class="text-gray-700">Early designs had Arsenyk as a more traditional slime creature, but the decision to make him maintain human form added depth to his character psychology.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Power Balancing</h3>
+                                <p class="text-gray-700">The berserker mode's paralysis aftereffect was added to prevent overuse of this powerful ability in narratives.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Equipment Evolution</h3>
+                                <p class="text-gray-700">Echopride's seventh bullet effect is being kept secret even from most writers to allow for a dramatic reveal later in the story.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="info-card p-6 mb-8" contenteditable="true">
+                        <h2 class="text-2xl font-bold mb-4 section-title">Behind the Scenes</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Name Origin</h3>
+                                <p class="text-gray-700">"Arsenyk" combines "arsenic" (a toxic element) with a Slavic name suffix, reflecting the character's dangerous nature and Eastern European-inspired background.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Worldbuilding</h3>
+                                <p class="text-gray-700">The fusion of steampunk, medieval, and contemporary arcane elements was specifically designed to allow for diverse storytelling environments.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Character Growth</h3>
+                                <p class="text-gray-700">Future story arcs are planned to explore whether Arsenyk will maintain his isolation or form meaningful connections despite his traumatic past.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card p-6" contenteditable="true">
+                        <h2 class="text-2xl font-bold mb-4 section-title">Cultural References</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Megumin Gloves</h3>
+                                <p class="text-gray-700">The explicit reference to Konosuba's Megumin shows the creator's anime influences and adds recognizable flair to the design.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Atelier Inspiration</h3>
+                                <p class="text-gray-700">The Ryza bust comparison ties into popular character design trends in JRPGs and anime gaming.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-purple-700">Seven Sins</h3>
+                                <p class="text-gray-700">Echopride's seven bullets follow a long tradition of seven sin motifs in anime and games, from Fullmetal Alchemist to Seven Deadly Sins.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <h3 class="text-xl font-bold mb-2">Arsenyk Wiki</h3>
+                    <p class="text-gray-400">The definitive resource for the enigmatic slime entity</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-discord"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-reddit-alien"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-sm text-gray-400">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <p>Content is available under <a href="#" class="text-purple-400 hover:underline">CC-BY-SA</a> unless otherwise noted.</p>
+                    </div>
+                    <div>
+                        <ul class="flex flex-wrap gap-4">
+                            <li><a href="#" class="hover:text-white hover:underline">Terms of Use</a></li>
+                            <li><a href="#" class="hover:text-white hover:underline">Privacy Policy</a></li>
+                            <li><a href="#" class="hover:text-white hover:underline">Community Guidelines</a></li>
+                            <li><a href="#" class="hover:text-white hover:underline">Cookie Statement</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Control Menu -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <div class="bg-purple-600 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg cursor-pointer" id="control-menu-button">
+            <i class="fas fa-cog text-2xl"></i>
+        </div>
+        <div class="hidden bg-white rounded-lg shadow-xl p-4 absolute bottom-20 right-0 w-64" id="control-menu">
+            <h3 class="font-bold mb-3 text-purple-700">Editor Controls</h3>
+            <button class="w-full bg-purple-100 hover:bg-purple-200 text-purple-700 py-2 px-3 rounded mb-2 text-left" onclick="addNewTab()">
+                <i class="fas fa-plus-circle mr-2"></i> Add New Tab
+            </button>
+            <button class="w-full bg-purple-100 hover:bg-purple-200 text-purple-700 py-2 px-3 rounded mb-2 text-left" onclick="duplicateCurrentTab()">
+                <i class="fas fa-copy mr-2"></i> Duplicate Tab
+            </button>
+            <button class="w-full bg-purple-100 hover:bg-purple-200 text-purple-700 py-2 px-3 rounded mb-2 text-left" onclick="addEditableTable()">
+                <i class="fas fa-table mr-2"></i> Add Table
+            </button>
+            <button class="w-full bg-purple-100 hover:bg-purple-200 text-purple-700 py-2 px-3 rounded mb-2 text-left" onclick="addImageBlock()">
+                <i class="fas fa-image mr-2"></i> Add Image
+            </button>
+            <button class="w-full bg-purple-100 hover:bg-purple-200 text-purple-700 py-2 px-3 rounded mb-2 text-left" onclick="addTextBlock()">
+                <i class="fas fa-font mr-2"></i> Add Text
+            </button>
+            <button class="w-full bg-purple-100 hover:bg-purple-200 text-purple-700 py-2 px-3 rounded mb-2 text-left" onclick="undoLastAction()">
+                <i class="fas fa-undo mr-2"></i> Undo
+            </button>
+            <button class="w-full bg-purple-100 hover:bg-purple-200 text-purple-700 py-2 px-3 rounded text-left" onclick="resetAll()">
+                <i class="fas fa-trash-alt mr-2"></i> Reset All
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Undo stack
+        const undoStack = [];
+        let currentState = null;
+        
+        // Save initial state
+        setTimeout(() => {
+            currentState = document.querySelector('main').innerHTML;
+        }, 500);
+        
+        // Save state before modifications
+        function saveState() {
+            if (currentState) {
+                undoStack.push(currentState);
+                if (undoStack.length > 50) undoStack.shift(); // Limit stack size
+            }
+            currentState = document.querySelector('main').innerHTML;
+        }
+        
+        // Undo functionality
+        function undoLastAction() {
+            if (undoStack.length > 0) {
+                const previousState = undoStack.pop();
+                document.querySelector('main').innerHTML = previousState;
+                currentState = previousState;
+                bindDeleteButtons(); // Rebind delete buttons after undo
+            } else {
+                alert("Nothing to undo!");
+            }
+            document.getElementById('control-menu').classList.add('hidden');
+        }
+
+        // Reset all functionality
+        function resetAll() {
+            if (confirm("Are you sure you want to reset everything? This cannot be undone.")) {
+                const mainContent = document.querySelector('main');
+                const originalHTML = mainContent.innerHTML;
+                undoStack.push(originalHTML);
+                mainContent.innerHTML = `
+                    <div id="overview" class="tab-content active">
+                        <div class="flex justify-center items-center h-64">
+                            <div class="text-center">
+                                <h2 class="text-2xl font-bold mb-4">Wiki Reset</h2>
+                                <p class="text-gray-600">Start adding new content using the editor controls</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                currentState = mainContent.innerHTML;
+                document.getElementById('control-menu').classList.add('hidden');
+            }
+        }
+        
+        // Delete element
+        function deleteElement(element) {
+            saveState();
+            element.remove();
+        }
+        
+        // Bind delete buttons to all editable elements
+        function bindDeleteButtons() {
+            document.querySelectorAll('.info-card, .character-image-container').forEach(el => {
+                // Only add if not already exists
+                if (!el.querySelector('.delete-btn')) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.setAttribute('contenteditable', 'false');
+                    deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        saveState();
+                        deleteElement(el);
+                    };
+                    el.style.position = 'relative';
+                    el.appendChild(deleteBtn);
+                }
+            });
+        }
+        
+        // Toggle control menu
+        document.getElementById('control-menu-button').addEventListener('click', function() {
+            document.getElementById('control-menu').classList.toggle('hidden');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#control-menu') && !e.target.closest('#control-menu-button')) {
+                document.getElementById('control-menu').classList.add('hidden');
+            }
+        });
+
+        // Image URL update function
+        function updateImage(input, imgId) {
+            const img = document.getElementById(imgId);
+            if (input.value) {
+                img.src = input.value;
+            }
+        }
+
+        // Editor Functions
+        function addNewTab() {
+            saveState();
+            const tabName = prompt("Enter new tab name:");
+            if (!tabName) return;
+            
+            const tabId = tabName.toLowerCase().replace(/\s+/g, '-');
+            
+            // Add new nav tab
+            const navTabs = document.querySelector('.nav-tabs');
+            const newTab = document.createElement('button');
+            newTab.className = 'nav-tab px-6 py-3 font-medium';
+            newTab.setAttribute('data-tab', tabId);
+            newTab.innerHTML = `<i class="fas fa-star mr-2"></i> ${tabName}`;
+            navTabs.appendChild(newTab);
+            
+            // Add new content tab
+            const newContent = document.createElement('div');
+            newContent.id = tabId;
+            newContent.className = 'tab-content p-6';
+            newContent.innerHTML = `
+                <div class="info-card p-6 mb-8" contenteditable="true">
+                    <h2 class="text-2xl font-bold mb-4 section-title">${tabName} Content</h2>
+                    <p>Start editing this new tab content...</p>
+                </div>
+            `;
+            document.querySelector('main').appendChild(newContent);
+            
+            // Add click event to new tab
+            newTab.addEventListener('click', function() {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+            
+            document.getElementById('control-menu').classList.add('hidden');
+        }
+
+        function duplicateCurrentTab() {
+            saveState();
+            const activeTab = document.querySelector('.nav-tab.active');
+            if (!activeTab) return;
+            
+            const tabName = prompt("Enter name for duplicated tab:", activeTab.textContent.trim() + " Copy");
+            if (!tabName) return;
+            
+            const originalContent = document.querySelector('.tab-content.active');
+            const tabId = tabName.toLowerCase().replace(/\s+/g, '-');
+            
+            // Add new nav tab
+            const navTabs = document.querySelector('.nav-tabs');
+            const newTab = document.createElement('button');
+            newTab.className = 'nav-tab px-6 py-3 font-medium';
+            newTab.setAttribute('data-tab', tabId);
+            newTab.innerHTML = `<i class="${activeTab.querySelector('i').className}"></i> ${tabName}`;
+            navTabs.appendChild(newTab);
+            
+            // Add new content tab (duplicate)
+            const newContent = document.createElement('div');
+            newContent.id = tabId;
+            newContent.className = 'tab-content p-6';
+            newContent.innerHTML = originalContent.innerHTML;
+            document.querySelector('main').appendChild(newContent);
+            
+            // Add click event to new tab
+            newTab.addEventListener('click', function() {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+            
+            document.getElementById('control-menu').classList.add('hidden');
+        }
+
+        function addEditableTable() {
+            saveState();
+            const activeContent = document.querySelector('.tab-content.active');
+            if (!activeContent) return;
+            
+            const rows = parseInt(prompt("Number of rows:", "3")) || 3;
+            const cols = parseInt(prompt("Number of columns:", "3")) || 3;
+            
+            let tableHTML = `
+                <div class="info-card p-6 mb-8" contenteditable="true">
+                    <h3 class="text-xl font-bold mb-4">Editable Table</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100">
+            `;
+            
+            // Add headers
+            for (let i = 0; i < cols; i++) {
+                tableHTML += `<th class="border p-2" contenteditable="true">Header ${i+1}</th>`;
+            }
+            
+            tableHTML += `</tr></thead><tbody>`;
+            
+            // Add rows
+            for (let i = 0; i < rows; i++) {
+                tableHTML += `<tr>`;
+                for (let j = 0; j < cols; j++) {
+                    tableHTML += `<td class="border p-2" contenteditable="true">Cell ${i+1}-${j+1}</td>`;
+                }
+                tableHTML += `</tr>`;
+            }
+            
+            tableHTML += `</tbody></table></div></div>`;
+            
+            activeContent.insertAdjacentHTML('beforeend', tableHTML);
+            document.getElementById('control-menu').classList.add('hidden');
+        }
+
+        function addImageBlock() {
+            saveState();
+            const activeContent = document.querySelector('.tab-content.active');
+            if (!activeContent) return;
+            
+            const imageHTML = `
+                <div class="info-card p-6 mb-8">
+                    <input type="text" placeholder="Enter image URL here" class="w-full mb-2 p-2 border rounded" onchange="updateImage(this, 'new-image-${Date.now()}')">
+                    <img id="new-image-${Date.now()}" src="https://via.placeholder.com/600x400/9f7aea/ffffff?text=New+Image" alt="New Image" class="w-full rounded-lg">
+                    <div class="mt-2" contenteditable="true">
+                        <p class="text-sm text-gray-600">Image caption text here...</p>
+                    </div>
+                </div>
+            `;
+            
+            activeContent.insertAdjacentHTML('beforeend', imageHTML);
+            document.getElementById('control-menu').classList.add('hidden');
+        }
+
+        function addTextBlock() {
+            saveState();
+            const activeContent = document.querySelector('.tab-content.active');
+            if (!activeContent) return;
+            
+            const textHTML = `
+                <div class="info-card p-6 mb-8" contenteditable="true">
+                    <h3 class="text-xl font-bold mb-3">New Text Section</h3>
+                    <p>Start typing your content here...</p>
+                </div>
+            `;
+            
+            activeContent.insertAdjacentHTML('beforeend', textHTML);
+            document.getElementById('control-menu').classList.add('hidden');
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bind delete buttons
+            bindDeleteButtons();
+            
+            const tabs = document.querySelectorAll('.nav-tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    tab.classList.add('active');
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Mobile menu toggle would go here if needed
+        });
+    </script>
+</body>
+</html>
